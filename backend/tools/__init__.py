@@ -6,3 +6,7 @@ Relations:
 - Executed by `backend.agent`.
 - May utilize `backend.utils` for helper functions and `backend.models` for structured I/O.
 """
+
+from .equation_solver import bjorck_pereyra
+
+__all__ = ["bjorck_pereyra"]
