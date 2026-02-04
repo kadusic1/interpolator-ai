@@ -1,7 +1,3 @@
-from langchain.tools import tool
-
-
-@tool
 def bjorck_pereyra(
     x: list[float], f: list[float], tolerance: float = 1e-10
 ) -> list[float]:
