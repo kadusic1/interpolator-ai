@@ -3,8 +3,8 @@ from __future__ import annotations
 from pydantic import BaseModel, Field, field_validator
 
 
-class DirectInterpolationRequest(BaseModel):
-    """Request model for direct interpolation."""
+class InterpolationRequest(BaseModel):
+    """Generic request model for all interpolation methods."""
 
     points: list[tuple[float, float]] = Field(
         ..., min_length=2, description="Data points as (x, y) tuples"
@@ -23,15 +23,20 @@ class DirectInterpolationRequest(BaseModel):
         return points
 
 
-class DirectInterpolationResponse(BaseModel):
-    """Response model for direct interpolation results."""
+class InterpolationResponse(BaseModel):
+    """Base response model for all interpolation methods."""
 
     result: float = Field(..., description="Interpolated y-value at x_eval")
-    coefficients: list[float] = Field(
-        ..., description="Polynomial coefficients [a_0, a_1, ...] in ascending order"
-    )
     polynomial_degree: int = Field(
         ..., description="Degree of the interpolating polynomial"
+    )
+
+
+class DirectInterpolationResponse(InterpolationResponse):
+    """Response model for direct interpolation with coefficients."""
+
+    coefficients: list[float] = Field(
+        ..., description="Polynomial coefficients [a_0, a_1, ...] in ascending order"
     )
 
     model_config = {
@@ -40,6 +45,27 @@ class DirectInterpolationResponse(BaseModel):
                 {
                     "result": 3.25,
                     "coefficients": [1.0, 0.5, 1.0],
+                    "polynomial_degree": 2,
+                }
+            ]
+        }
+    }
+
+
+class LagrangeInterpolationResponse(InterpolationResponse):
+    """Response model for Lagrange interpolation with basis values."""
+
+    basis_values: list[float] = Field(
+        ...,
+        description="Lagrange basis polynomial values [L_0(x_eval), ..., L_n(x_eval)]",
+    )
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "result": 3.25,
+                    "basis_values": [0.125, 0.75, 0.125],
                     "polynomial_degree": 2,
                 }
             ]

@@ -7,7 +7,8 @@ Relations:
 - May utilize `backend.utils` for helper functions and `backend.models` for structured I/O.
 """
 
-from .equation_solver import bjorck_pereyra
 from .direct_interpolation import direct_interpolation
+from .equation_solver import bjorck_pereyra
+from .lagrange_interpolation import lagrange_interpolation
 
-__all__ = ["bjorck_pereyra", "direct_interpolation"]
+__all__ = ["bjorck_pereyra", "direct_interpolation", "lagrange_interpolation"]

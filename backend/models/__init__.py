@@ -6,6 +6,16 @@ Relations:
 - Fundamental dependency for `backend.api` (schemas), `backend.agent` (state), and `backend.tools` (inputs/outputs).
 """
 
-from .interpolation import DirectInterpolationRequest, DirectInterpolationResponse
+from .interpolation import (
+    DirectInterpolationResponse,
+    InterpolationRequest,
+    InterpolationResponse,
+    LagrangeInterpolationResponse,
+)
 
-__all__ = ["DirectInterpolationRequest", "DirectInterpolationResponse"]
+__all__ = [
+    "InterpolationRequest",
+    "InterpolationResponse",
+    "DirectInterpolationResponse",
+    "LagrangeInterpolationResponse",
+]
