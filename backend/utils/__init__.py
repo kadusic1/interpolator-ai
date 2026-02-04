@@ -5,3 +5,7 @@ This module contains code that is reusable across different parts of the backend
 Relations:
 - Helper module used by `backend.agent`, `backend.tools`, and `backend.api` as needed.
 """
+
+from .equation_solver import bjorck_pereyra
+
+__all__ = ["bjorck_pereyra"]

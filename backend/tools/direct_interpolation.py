@@ -3,7 +3,7 @@ from __future__ import annotations
 from langchain.tools import tool
 
 from backend.models.interpolation import DirectInterpolationResponse
-from backend.tools.equation_solver import bjorck_pereyra
+from backend.utils.equation_solver import bjorck_pereyra
 
 
 @tool

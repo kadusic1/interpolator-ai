@@ -8,7 +8,6 @@ Relations:
 """
 
 from .direct_interpolation import direct_interpolation
-from .equation_solver import bjorck_pereyra
 from .lagrange_interpolation import lagrange_interpolation
 
-__all__ = ["bjorck_pereyra", "direct_interpolation", "lagrange_interpolation"]
+__all__ = ["direct_interpolation", "lagrange_interpolation"]
