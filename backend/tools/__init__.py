@@ -8,12 +8,14 @@ Relations:
 """
 
 from .direct_interpolation import direct_interpolation
+from .graph_polynomial import graph_polynomial
 from .lagrange_interpolation import lagrange_interpolation
 from .newton_backward_interpolation import newton_backward_interpolation
 from .newton_forward_interpolation import newton_forward_interpolation
 
 __all__ = [
     "direct_interpolation",
+    "graph_polynomial",
     "lagrange_interpolation",
     "newton_forward_interpolation",
     "newton_backward_interpolation",
