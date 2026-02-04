@@ -207,3 +207,184 @@ def select_optimal_x0_index(x_values: list[float], x_eval: float, method: str) -
 
         # Fallback (should not reach here)
         return 0 if method == "forward" else n - 1
+
+
+def get_newton_forward_coefficients(
+    y_values: list[float], x_values: list[float], x0_index: int, h: float
+) -> list[float]:
+    """
+    Compute polynomial coefficients for Newton forward interpolation.
+
+    Converts the Newton forward interpolation formula to standard polynomial form:
+        P(x) = a0 + a1*x + a2*x^2 + ...
+
+    The function first builds the polynomial in terms of s = (x - x0)/h, then expands
+    it to standard x form.
+    Each term uses the forward difference table and the generalized binomial coefficients.
+
+    Args:
+        y_values: List of y-coordinates.
+        x_values: List of x-coordinates.
+        x0_index: Index of reference point x₀.
+        h: Step size between x-values.
+
+    Returns:
+        List of coefficients [a0, a1, a2, ...] for the polynomial P(x).
+
+    Example:
+        >>> get_newton_forward_coefficients([1, 4, 9], [1, 2, 3], 0, 1)
+        [1.0, 2.0, 1.0]
+        # This means P(x) = 1 + 2x + x^2
+    """
+
+    n = len(y_values)
+    difference_table = compute_difference_table(y_values)
+    x0 = x_values[x0_index]
+
+    # Start with coefficients in terms of (x - x0)/h
+    # We'll build polynomial in terms of s = (x - x0)/h first
+    # P(s) = c0 + c1*s + c2*s² + ...
+
+    # Initialize result coefficients
+    result_coeffs = [0.0] * n
+
+    # Build polynomial term by term
+    # Each term is: (s,k) * Δᵏf₀
+    # where (s,k) = s(s-1)(s-2)...(s-k+1) / k!
+
+    for k in range(n - x0_index):
+        if k >= len(difference_table) or x0_index >= len(difference_table[k]):
+            break
+
+        # Get the difference value
+        diff_value = difference_table[k][x0_index]
+
+        # Build the binomial polynomial (s,k) as coefficients
+        # (s,k) = s(s-1)(s-2)...(s-k+1) / k!
+        binomial_poly = [1.0]  # Start with 1
+
+        for i in range(k):
+            # Multiply by (s - i)
+            new_poly = [0.0] * (len(binomial_poly) + 1)
+            for j in range(len(binomial_poly)):
+                new_poly[j] += binomial_poly[j] * (-i)
+                new_poly[j + 1] += binomial_poly[j]
+            binomial_poly = new_poly
+
+        # Divide by k!
+        factorial = 1
+        for i in range(1, k + 1):
+            factorial *= i
+
+        # Add this term's contribution
+        for j in range(len(binomial_poly)):
+            result_coeffs[j] += (binomial_poly[j] / factorial) * diff_value
+
+    # Now convert from s = (x - x0)/h to x
+    # If P(s) = Σ cᵢ * sⁱ and s = (x - x0)/h
+    # Then P(x) = Σ cᵢ * ((x - x0)/h)ⁱ
+
+    # We need to expand ((x - x0)/h)ⁱ = (1/hⁱ) * (x - x0)ⁱ
+    final_coeffs = [0.0] * n
+
+    for i, ci in enumerate(result_coeffs):
+        if ci == 0:
+            continue
+        # Expand (x - x0)^i
+        term_poly = [1.0]
+        for _ in range(i):
+            new_poly = [0.0] * (len(term_poly) + 1)
+            for j in range(len(term_poly)):
+                new_poly[j] += term_poly[j] * (-x0)
+                new_poly[j + 1] += term_poly[j]
+            term_poly = new_poly
+
+        # Multiply by ci / h^i
+        scale = ci / (h**i)
+        for j in range(len(term_poly)):
+            final_coeffs[j] += term_poly[j] * scale
+
+    return final_coeffs
+
+
+def get_newton_backward_coefficients(
+    y_values: list[float], x_values: list[float], x0_index: int, h: float
+) -> list[float]:
+    """
+    Compute polynomial coefficients for Newton backward interpolation.
+
+    Converts the Newton backward interpolation formula to standard polynomial form:
+        P(x) = a0 + a1*x + a2*x^2 + ...
+
+    The function builds the polynomial using the backward difference table and backward binomial coefficients, then expands to standard x form.
+
+    Args:
+        y_values: List of y-coordinates.
+        x_values: List of x-coordinates.
+        x0_index: Index of reference point x₀ (usually near the end of the interval).
+        h: Step size between x-values.
+
+    Returns:
+        List of coefficients [a0, a1, a2, ...] for the polynomial P(x).
+
+    Example:
+        >>> get_newton_backward_coefficients([1, 4, 9], [1, 2, 3], 2, 1)
+        [1.0, 2.0, 1.0]
+        # This means P(x) = 1 + 2x + x^2
+    """
+
+    n = len(y_values)
+    difference_table = compute_difference_table(y_values)
+    x0 = x_values[x0_index]
+
+    result_coeffs = [0.0] * n
+
+    # Build polynomial using backward binomial (s+,k)
+    max_k = min(x0_index + 1, len(difference_table))
+
+    for k in range(max_k):
+        diff_index = x0_index - k
+
+        if diff_index < 0 or diff_index >= len(difference_table[k]):
+            break
+
+        diff_value = difference_table[k][diff_index]
+
+        # Build (s+,k) = s(s+1)(s+2)...(s+k-1) / k!
+        binomial_poly = [1.0]
+
+        for i in range(k):
+            # Multiply by (s + i)
+            new_poly = [0.0] * (len(binomial_poly) + 1)
+            for j in range(len(binomial_poly)):
+                new_poly[j] += binomial_poly[j] * i
+                new_poly[j + 1] += binomial_poly[j]
+            binomial_poly = new_poly
+
+        # Divide by k!
+        factorial = 1
+        for i in range(1, k + 1):
+            factorial *= i
+
+        for j in range(len(binomial_poly)):
+            result_coeffs[j] += (binomial_poly[j] / factorial) * diff_value
+
+    # Convert from s to x (same as forward)
+    final_coeffs = [0.0] * n
+
+    for i, ci in enumerate(result_coeffs):
+        if ci == 0:
+            continue
+        term_poly = [1.0]
+        for _ in range(i):
+            new_poly = [0.0] * (len(term_poly) + 1)
+            for j in range(len(term_poly)):
+                new_poly[j] += term_poly[j] * (-x0)
+                new_poly[j + 1] += term_poly[j]
+            term_poly = new_poly
+
+        scale = ci / (h**i)
+        for j in range(len(term_poly)):
+            final_coeffs[j] += term_poly[j] * scale
+
+    return final_coeffs

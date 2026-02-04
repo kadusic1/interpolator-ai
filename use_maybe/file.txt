@@ -1,0 +1,7 @@
+https://www.researchgate.net/publication/230872638_Solutions_of_Vandermonde_Systems_of_Equations/link/544413ff0cf2a76a3ccd6b2a/download?_tp=eyJjb250ZXh0Ijp7ImZpcnN0UGFnZSI6InB1YmxpY2F0aW9uIiwicGFnZSI6InB1YmxpY2F0aW9uIn19
+
+refactor: unify interpolation tools to return polynomial coefficients
+
+Standardizes all interpolation methods to return a consistent response 
+structure. Implemented coefficient extraction logic for Lagrange and 
+Newton methods to align them with the generalized output.

@@ -2,12 +2,13 @@ from __future__ import annotations
 
 from langchain.tools import tool
 
-from backend.models.interpolation import NewtonBackwardInterpolationResponse
+from backend.models.interpolation import InterpolationResponse
 from backend.utils.newton_interpolation_util import (
     backward_binomial_coefficient,
     compute_difference_table,
     select_optimal_x0_index,
     validate_equidistant,
+    get_newton_backward_coefficients,
 )
 
 
@@ -66,13 +67,7 @@ def newton_backward_interpolation(
         >>> newton_backward_interpolation(points, 3.44)
         {
             'result': 0.290695,
-            'difference_table': [[0.294118, 0.285714, 0.277778],
-                                 [-0.008404, -0.007936],
-                                 [0.000468]],
-            'step_size': 0.1,
-            's_parameter': -0.6,
-            'x0': 3.5,
-            'x0_index': 1,
+            'coefficients': [a0, a1, a2],
             'polynomial_degree': 2
         }
     """
@@ -133,13 +128,11 @@ def newton_backward_interpolation(
     # Calculate polynomial degree
     polynomial_degree = len(points) - 1
 
+    coefficients = get_newton_backward_coefficients(y_values, x_values, x0_index, h)
+
     # Return structured response as dictionary
-    return NewtonBackwardInterpolationResponse(
+    return InterpolationResponse(
         result=result,
-        difference_table=difference_table,
-        step_size=h,
-        s_parameter=s,
-        x0=x0,
-        x0_index=x0_index,
+        coefficients=coefficients,
         polynomial_degree=polynomial_degree,
     ).model_dump()
