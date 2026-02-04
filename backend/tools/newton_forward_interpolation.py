@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from langchain.tools import tool
 
-from backend.models.interpolation import NewtonForwardInterpolationResponse
+from backend.models.interpolation import InterpolationResponse
 from backend.utils.newton_interpolation_util import (
     compute_difference_table,
     forward_binomial_coefficient,
+    get_newton_forward_coefficients,
     select_optimal_x0_index,
     validate_equidistant,
 )
@@ -64,13 +65,7 @@ def newton_forward_interpolation(
         >>> newton_forward_interpolation(points, 3.44)
         {
             'result': 0.290756,
-            'difference_table': [[0.294118, 0.285714, 0.277778],
-                                 [-0.008404, -0.007936],
-                                 [0.000468]],
-            'step_size': 0.1,
-            's_parameter': 0.4,
-            'x0': 3.4,
-            'x0_index': 0,
+            'coefficients': [a0, a1, a2],
             'polynomial_degree': 2
         }
     """
@@ -117,16 +112,14 @@ def newton_forward_interpolation(
         difference = difference_table[k][x0_index]
         result += binomial * difference
 
+    coefficients = get_newton_forward_coefficients(y_values, x_values, x0_index, h)
+
     # Calculate polynomial degree
     polynomial_degree = len(points) - 1
 
     # Return structured response as dictionary
-    return NewtonForwardInterpolationResponse(
+    return InterpolationResponse(
         result=result,
-        difference_table=difference_table,
-        step_size=h,
-        s_parameter=s,
-        x0=x0,
-        x0_index=x0_index,
+        coefficients=coefficients,
         polynomial_degree=polynomial_degree,
     ).model_dump()

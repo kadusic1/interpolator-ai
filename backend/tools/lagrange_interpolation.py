@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from langchain.tools import tool
 
-from backend.models.interpolation import LagrangeInterpolationResponse
+from backend.models.interpolation import InterpolationResponse
+from backend.utils.lagrange_interpolation_util import get_lagrange_coefficients
+from backend.utils.general_util import evaluate_polynomial
 
 
 @tool
@@ -30,8 +32,7 @@ def lagrange_interpolation(points: list[tuple[float, float]], x_eval: float) -> 
     Returns:
         Dictionary containing:
             - 'result': The interpolated y-value at x_eval
-            - 'basis_values': List of Lagrange basis values [L_0(x_eval),
-              L_1(x_eval), ..., L_n(x_eval)]
+            - 'coefficients': List of polynomial coefficients [a0, a1, a2, ...]
             - 'polynomial_degree': Degree of the interpolating polynomial
 
     Raises:
@@ -43,7 +44,7 @@ def lagrange_interpolation(points: list[tuple[float, float]], x_eval: float) -> 
         >>> lagrange_interpolation(points, 3.45)
         {
             'result': 0.289855,
-            'basis_values': [0.5, -0.5, 1.0],
+            'coefficients': [a0, a1, a2],
             'polynomial_degree': 2
         }
     """
@@ -56,31 +57,18 @@ def lagrange_interpolation(points: list[tuple[float, float]], x_eval: float) -> 
     # Check for duplicate x-coordinates
     if len(set(x_values)) != len(x_values):
         raise ValueError("Duplicate x-coordinates detected in input points.")
-    y_values = [p[1] for p in points]
 
-    n = len(points)  # Number of points
-    basis_values = []  # Store L_k(x_eval) for each k
-
-    # Compute each Lagrange basis polynomial L_k(x_eval)
-    # L_k(x) = Π (x - x_i)/(x_k - x_i) for i=0 to n, i≠k
-    for k in range(n):
-        L_k = 1.0
-        for i in range(n):
-            if i != k:
-                # Multiply by (x_eval - x_i) / (x_k - x_i)
-                L_k *= (x_eval - x_values[i]) / (x_values[k] - x_values[i])
-        basis_values.append(L_k)
-
-    # Compute the interpolated value using equation (4.22):
-    # P_n(x_eval) = Σ L_k(x_eval) * y_k
-    result = sum(L_k * y_k for L_k, y_k in zip(basis_values, y_values))
+    # Get polynomial coefficients (calculates basis polynomials once)
+    coefficients = get_lagrange_coefficients(points)
+    # Evaluate the polynomial at x_eval using the coefficients
+    result = evaluate_polynomial(coefficients, x_eval)
 
     # Calculate polynomial degree (n-1 for n points)
     polynomial_degree = len(points) - 1
 
     # Return structured response as dictionary
-    return LagrangeInterpolationResponse(
+    return InterpolationResponse(
         result=result,
-        basis_values=basis_values,
+        coefficients=coefficients,
         polynomial_degree=polynomial_degree,
     ).model_dump()

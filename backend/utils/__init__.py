@@ -14,6 +14,8 @@ from .newton_interpolation_util import (
     select_optimal_x0_index,
     validate_equidistant,
 )
+from .general_util import multiply_polynomials, evaluate_polynomial
+from .lagrange_interpolation_util import get_lagrange_coefficients
 
 __all__ = [
     "bjorck_pereyra",
@@ -22,4 +24,7 @@ __all__ = [
     "forward_binomial_coefficient",
     "backward_binomial_coefficient",
     "select_optimal_x0_index",
+    "multiply_polynomials",
+    "get_lagrange_coefficients",
+    "evaluate_polynomial",
 ]

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from langchain.tools import tool
 
-from backend.models.interpolation import DirectInterpolationResponse
+from backend.models.interpolation import InterpolationResponse
 from backend.utils.equation_solver import bjorck_pereyra
 
 
@@ -72,6 +72,6 @@ def direct_interpolation(points: list[tuple[float, float]], x_eval: float) -> di
     polynomial_degree = len(points) - 1
 
     # Return structured response as dictionary
-    return DirectInterpolationResponse(
+    return InterpolationResponse(
         result=result, coefficients=coefficients, polynomial_degree=polynomial_degree
     ).model_dump()

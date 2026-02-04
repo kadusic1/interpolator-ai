@@ -7,15 +7,11 @@ Relations:
 """
 
 from .interpolation import (
-    DirectInterpolationResponse,
     InterpolationRequest,
     InterpolationResponse,
-    LagrangeInterpolationResponse,
 )
 
 __all__ = [
     "InterpolationRequest",
     "InterpolationResponse",
-    "DirectInterpolationResponse",
-    "LagrangeInterpolationResponse",
 ]
