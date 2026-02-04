@@ -8,5 +8,6 @@ Relations:
 """
 
 from .equation_solver import bjorck_pereyra
+from .direct_interpolation import direct_interpolation
 
-__all__ = ["bjorck_pereyra"]
+__all__ = ["bjorck_pereyra", "direct_interpolation"]
