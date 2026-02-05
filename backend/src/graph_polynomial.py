@@ -5,12 +5,10 @@ import io
 
 import matplotlib.pyplot as plt
 import numpy as np
-from langchain.tools import tool
 
 from backend.utils.general_util import evaluate_polynomial
 
 
-@tool
 def graph_polynomial(
     coefficients: list[float], points: list[tuple[float, float]]
 ) -> dict:

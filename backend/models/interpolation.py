@@ -10,6 +10,7 @@ class InterpolationRequest(BaseModel):
         ..., min_length=2, description="Data points as (x, y) tuples"
     )
     x_eval: float = Field(..., description="X-coordinate to interpolate at")
+    method: str = Field(..., description="Interpolation method name")
 
     @field_validator("points")
     @classmethod
@@ -21,6 +22,21 @@ class InterpolationRequest(BaseModel):
         if len(x_values) != len(set(x_values)):
             raise ValueError("X-coordinates must be unique")
         return points
+
+
+class InterpolationRequestList(BaseModel):
+    """Container for multiple interpolation requests."""
+
+    requests: list[InterpolationRequest] = Field(
+        ..., description="List of interpolation requests"
+    )
+    is_interpolation_request: bool = Field(
+        True,
+        description="False if the user input is completely unrelated to interpolation",
+    )
+    clarification_message: str | None = Field(
+        None, description="Message to user if request is invalid or unrelated"
+    )
 
 
 class InterpolationResponse(BaseModel):
@@ -54,3 +70,15 @@ class InterpolationResponse(BaseModel):
             ]
         }
     }
+
+
+class InterpolationResponseWithMetadata(InterpolationResponse):
+    """Response model including the polynomial graph."""
+
+    points: list[tuple[float, float]] = Field(
+        ..., min_length=2, description="Data points as (x, y) tuples"
+    )
+    method: str = Field(..., description="Interpolation method name")
+    image_base64: str = Field(
+        ..., description="Base64 encoded PNG image of the polynomial graph"
+    )
