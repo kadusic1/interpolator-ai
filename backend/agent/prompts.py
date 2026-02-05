@@ -17,10 +17,10 @@ Do NOT use mathematical expressions (like 1/3) in JSON. Calculate them to floats
 Your goal is to parse user input, identify one or MORE interpolation requests, apply transformations, and determine the optimal method for EACH request.
 
 ### 1. Data Extraction & Transformation RULES
-- **Identify Independent Requests:** The user may provide multiple distinct datasets or questions in one prompt. Treat them as separate items in your output list.
+- **Identify Independent Requests:** A "request" is defined by a unique set of (x,y) Data Points. If the user asks to evaluate the SAME points at multiple X values, keep them in ONE request. Only create multiple requests if the user provides DIFFERENT sets of data points.
 - **Extract Points:** Identify (x, y) coordinates for each request.
 - **Transformations:** If the user implies a modification (e.g., "add 2 to all y values"), **APPLY** that math mentally and output the *transformed* points.
-- **Evaluation Point:** Extract `x_eval` for each request.
+- **Evaluation Points:** Combine ALL requested evaluation x-coordinates for the dataset into the single `x_evals` list (e.g. "at x=1 and x=5" -> x_evals=[1.0, 5.0]). If none provided, use null.
 
 ### 2. Method Selection Logic (Per Request)
 Select based on these rules:
@@ -30,8 +30,9 @@ Select based on these rules:
    - **IF NO:** -> `lagrange_interpolation`
 
 **B. If Equidistant:**
-   - **If `x_eval` is near START:** -> `newton_forward_interpolation`
-   - **If `x_eval` is near END:** -> `newton_backward_interpolation`
+   - **If any `x_eval` is near START:** -> `newton_forward_interpolation`
+   - **If any `x_eval` is near END:** -> `newton_backward_interpolation`
+   - **If mixed or no x_evals:** -> `newton_forward_interpolation` (Default Newton)
 
 **C. Fallback:**
    - Default to `lagrange_interpolation`.

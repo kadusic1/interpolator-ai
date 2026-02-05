@@ -4,7 +4,9 @@ from backend.models.interpolation import InterpolationResponse
 from backend.utils.equation_solver import bjorck_pereyra
 
 
-def direct_interpolation(points: list[tuple[float, float]], x_eval: float) -> dict:
+def direct_interpolation(
+    points: list[tuple[float, float]], x_evals: list[float] | None
+) -> dict:
     """
     Perform direct polynomial interpolation using Vandermonde system.
 
@@ -21,11 +23,11 @@ def direct_interpolation(points: list[tuple[float, float]], x_eval: float) -> di
 
     Args:
         points: List of (x, y) coordinate tuples. Must have at least 2 points.
-        x_eval: The x-coordinate at which to evaluate the polynomial.
+        x_evals: List of x-coordinates at which to evaluate the polynomial.
 
     Returns:
         Dictionary containing:
-            - 'result': The interpolated y-value at x_eval
+            - 'results': The interpolated y-values at x_evals
             - 'coefficients': Polynomial coefficients [a_0, a_1, ...] in
               ascending power order
             - 'polynomial_degree': Degree of the interpolating polynomial
@@ -36,9 +38,9 @@ def direct_interpolation(points: list[tuple[float, float]], x_eval: float) -> di
 
     Example:
         >>> points = [(0.0, 1.0), (1.0, 2.0), (2.0, 5.0)]
-        >>> direct_interpolation(points, 1.5)
+        >>> direct_interpolation(points, [1.5])
         {
-            'result': 3.25,
+            'results': [3.25],
             'coefficients': [1.0, 0.0, 1.0],
             'polynomial_degree': 2
         }
@@ -58,17 +60,22 @@ def direct_interpolation(points: list[tuple[float, float]], x_eval: float) -> di
     # This returns coefficients [a_0, a_1, ..., a_n] in ascending power order
     coefficients = bjorck_pereyra(x_values, y_values)
 
-    # Evaluate polynomial at x_eval using Horner's method
-    # P(x) = a_0 + a_1*x + a_2*x^2 + ... + a_n*x^n
-    # Horner's method: P(x) = a_0 + x*(a_1 + x*(a_2 + ... + x*a_n))
-    result = 0.0
-    for coef in reversed(coefficients):
-        result = result * x_eval + coef
+    # Evaluate polynomial at x_evals using Horner's method
+    results = None
+    if x_evals:
+        results = []
+        for x in x_evals:
+            res = 0.0
+            for coef in reversed(coefficients):
+                res = res * x + coef
+            results.append(res)
 
     # Calculate polynomial degree (n for n+1 points)
     polynomial_degree = len(points) - 1
 
     # Return structured response as dictionary
     return InterpolationResponse(
-        result=result, coefficients=coefficients, polynomial_degree=polynomial_degree
+        results=results,
+        coefficients=coefficients,
+        polynomial_degree=polynomial_degree,
     ).model_dump()

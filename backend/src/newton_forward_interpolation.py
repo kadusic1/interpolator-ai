@@ -1,17 +1,15 @@
 from __future__ import annotations
 
 from backend.models.interpolation import InterpolationResponse
+from backend.utils.general_util import evaluate_polynomial
 from backend.utils.newton_interpolation_util import (
-    compute_difference_table,
-    forward_binomial_coefficient,
     get_newton_forward_coefficients,
-    select_optimal_x0_index,
     validate_equidistant,
 )
 
 
 def newton_forward_interpolation(
-    points: list[tuple[float, float]], x_eval: float
+    points: list[tuple[float, float]], x_evals: list[float] | None
 ) -> dict:
     """
     Perform Newton forward difference interpolation.
@@ -43,13 +41,8 @@ def newton_forward_interpolation(
 
     Returns:
         Dictionary containing:
-            - 'result': The interpolated y-value at x_eval
-            - 'difference_table': Full triangular table of forward
-              differences [[f_0, f_1, ...], [Δf_0, Δf_1, ...], ...]
-            - 'step_size': The constant step h
-            - 's_parameter': The value of s = (x_eval - x₀) / h
-            - 'x0': The starting point x₀ used for interpolation
-            - 'x0_index': Index of x₀ in the points array
+            - 'results': The interpolated y-values at x_evals
+            - 'coefficients': Polynomial coefficients [a0, a1, a2, ...]
             - 'polynomial_degree': Degree of the interpolating polynomial
 
     Raises:
@@ -59,9 +52,9 @@ def newton_forward_interpolation(
 
     Example:
         >>> points = [(3.4, 0.294118), (3.5, 0.285714), (3.6, 0.277778)]
-        >>> newton_forward_interpolation(points, 3.44)
+        >>> newton_forward_interpolation(points, [3.44])
         {
-            'result': 0.290756,
+            'results': [0.290756],
             'coefficients': [a0, a1, a2],
             'polynomial_degree': 2
         }
@@ -84,39 +77,22 @@ def newton_forward_interpolation(
     # Validate equidistant spacing and get step size h
     h = validate_equidistant(x_values)
 
-    # Select optimal starting index x₀ for forward interpolation
-    x0_index = select_optimal_x0_index(x_values, x_eval, method="forward")
-    x0 = x_values[x0_index]
-
-    # Compute the interpolation variable s = (x_eval - x₀) / h
-    s = (x_eval - x0) / h
-
-    # Build the forward difference table
-    difference_table = compute_difference_table(y_values)
-
-    # Evaluate the Newton forward polynomial:
-    # P(x) = f₀ + Σ (s,k) * Δᵏf₀ for k=1 to n
-    result = difference_table[0][x0_index]  # Start with f₀
-
-    # Add each term: (s,k) * Δᵏf_{x0_index}
-    n = len(points)
-    for k in range(1, n - x0_index):
-        # Check if we have enough differences at this level
-        if k >= len(difference_table) or x0_index >= len(difference_table[k]):
-            break
-
-        binomial = forward_binomial_coefficient(s, k)
-        difference = difference_table[k][x0_index]
-        result += binomial * difference
-
+    # Calculate coefficients
+    # Always use the first point (index 0) as reference for standard polynomial form
+    x0_index = 0
     coefficients = get_newton_forward_coefficients(y_values, x_values, x0_index, h)
+
+    # Evaluate at requested points
+    results = None
+    if x_evals:
+        results = [evaluate_polynomial(coefficients, x) for x in x_evals]
 
     # Calculate polynomial degree
     polynomial_degree = len(points) - 1
 
     # Return structured response as dictionary
     return InterpolationResponse(
-        result=result,
+        results=results,
         coefficients=coefficients,
         polynomial_degree=polynomial_degree,
     ).model_dump()

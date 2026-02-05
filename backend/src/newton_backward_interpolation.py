@@ -1,17 +1,15 @@
 from __future__ import annotations
 
 from backend.models.interpolation import InterpolationResponse
+from backend.utils.general_util import evaluate_polynomial
 from backend.utils.newton_interpolation_util import (
-    backward_binomial_coefficient,
-    compute_difference_table,
-    select_optimal_x0_index,
-    validate_equidistant,
     get_newton_backward_coefficients,
+    validate_equidistant,
 )
 
 
 def newton_backward_interpolation(
-    points: list[tuple[float, float]], x_eval: float
+    points: list[tuple[float, float]], x_evals: list[float] | None
 ) -> dict:
     """
     Perform Newton backward difference interpolation.
@@ -45,13 +43,8 @@ def newton_backward_interpolation(
 
     Returns:
         Dictionary containing:
-            - 'result': The interpolated y-value at x_eval
-            - 'difference_table': Full triangular table of forward
-              differences [[f_0, f_1, ...], [Δf_0, Δf_1, ...], ...]
-            - 'step_size': The constant step h
-            - 's_parameter': The value of s = (x_eval - x₀) / h
-            - 'x0': The reference point x₀ used for interpolation
-            - 'x0_index': Index of x₀ in the points array
+            - 'results': The interpolated y-values at x_evals
+            - 'coefficients': Polynomial coefficients [a0, a1, a2, ...]
             - 'polynomial_degree': Degree of the interpolating polynomial
 
     Raises:
@@ -61,9 +54,9 @@ def newton_backward_interpolation(
 
     Example:
         >>> points = [(3.4, 0.294118), (3.5, 0.285714), (3.6, 0.277778)]
-        >>> newton_backward_interpolation(points, 3.44)
+        >>> newton_backward_interpolation(points, [3.44])
         {
-            'result': 0.290695,
+            'results': [0.290695],
             'coefficients': [a0, a1, a2],
             'polynomial_degree': 2
         }
@@ -88,48 +81,23 @@ def newton_backward_interpolation(
     # Validate equidistant spacing and get step size h
     h = validate_equidistant(x_values)
 
-    # Select optimal starting index x₀ for backward interpolation
-    x0_index = select_optimal_x0_index(x_values, x_eval, method="backward")
-    x0 = x_values[x0_index]
+    # Calculate coefficients
+    # Use the last point (n-1) as reference for standard polynomial form
+    # This aligns with the backward method strategy
+    x0_index = len(x_values) - 1
+    coefficients = get_newton_backward_coefficients(y_values, x_values, x0_index, h)
 
-    # Compute the interpolation variable s = (x_eval - x₀) / h
-    # For backward interpolation, s is typically negative when
-    # interpolating before x₀
-    s = (x_eval - x0) / h
-
-    # Build the forward difference table (same structure, different usage)
-    difference_table = compute_difference_table(y_values)
-
-    # Evaluate the Newton backward polynomial:
-    # P(x) = f₀ + Σ (s⁺,k) * Δᵏf_{x0_index - k} for k=1 to x0_index
-    #
-    # The key insight: for backward interpolation, we use differences
-    # that END at x₀, which means we need Δᵏf_{x0_index - k}
-    result = difference_table[0][x0_index]  # Start with f₀
-
-    # Add each term: (s⁺,k) * Δᵏf_{x0_index - k}
-    max_k = min(x0_index + 1, len(difference_table))
-
-    for k in range(1, max_k):
-        # Access the difference that ends at x₀
-        # For level k, we need the difference at index (x0_index - k)
-        diff_index = x0_index - k
-
-        if diff_index < 0 or diff_index >= len(difference_table[k]):
-            break
-
-        binomial = backward_binomial_coefficient(s, k)
-        difference = difference_table[k][diff_index]
-        result += binomial * difference
+    # Evaluate at requested points
+    results = None
+    if x_evals:
+        results = [evaluate_polynomial(coefficients, x) for x in x_evals]
 
     # Calculate polynomial degree
     polynomial_degree = len(points) - 1
 
-    coefficients = get_newton_backward_coefficients(y_values, x_values, x0_index, h)
-
     # Return structured response as dictionary
     return InterpolationResponse(
-        result=result,
+        results=results,
         coefficients=coefficients,
         polynomial_degree=polynomial_degree,
     ).model_dump()
