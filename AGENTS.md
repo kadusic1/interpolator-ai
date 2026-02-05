@@ -9,8 +9,8 @@ This is a full-stack agentic numerical interpolation application built with:
 | Layer | Technology | Purpose |
 |-------|------------|---------|
 | Frontend | React + TypeScript | Chat UI & visualization |
-| API | FastAPI + LangServe | REST endpoints & agent serving |
-| Backend | Python 3.11+ + LangGraph | AI agent orchestration |
+| API | FastAPI | REST endpoints for agent communication |
+| Backend | Python 3.11+ + LangGraph | AI agent orchestration & validation |
 
 The AI agent delegates all mathematical operations to specialized tools and
 never performs calculations directly.
@@ -42,11 +42,23 @@ npm run dev
 
 ```bash
 # Start the API server (from project root)
-uvicorn backend.api.main:app --reload --port 8000
+uv run uvicorn backend.api.main:app --reload --port 8000
 
 # Start the frontend (in separate terminal)
 cd frontend && npm run dev
 ```
+
+### Running Both Services (Development)
+
+```bash
+# Option 1: Use separate terminals
+# Terminal 1 - Backend API
+uv run uvicorn backend.api.main:app --reload --port 8000
+
+# Terminal 2 - Frontend
+cd frontend && npm run dev
+```
+
 
 ### Running Both Services (Development)
 
@@ -104,7 +116,7 @@ from langgraph.graph import StateGraph
 from pydantic import BaseModel
 
 # Local
-from backend.tools.interpolation import lagrange_interpolate
+from backend.src.lagrange_interpolation import lagrange_interpolation
 from backend.utils.parsing import parse_function
 ```
 
@@ -179,23 +191,27 @@ except InsufficientPointsError as e:
 ### LangGraph Specific Patterns
 
 ```python
+from typing import Annotated, Sequence, TypedDict
+import operator
+from langchain_core.messages import BaseMessage
 from langgraph.graph import StateGraph, END
-from typing import TypedDict
 
 class AgentState(TypedDict):
-    """State passed between graph nodes."""
-    messages: list[dict[str, Any]]
-    points: list[tuple[float, float]] | None
-    result: float | None
+    """State passed between nodes in the extraction graph."""
+    messages: Annotated[Sequence[BaseMessage], operator.add]
+    parsed_output: InterpolationRequestList | None
+    clean_requests: list[InterpolationRequest]
+    valid: bool
+    final_response_text: str | None
 
-def create_graph() -> StateGraph:
-    """Create the interpolation agent graph."""
-    graph = StateGraph(AgentState)
-    graph.add_node("parse_input", parse_input_node)
-    graph.add_node("interpolate", interpolation_node)
-    graph.add_edge("parse_input", "interpolate")
-    graph.add_edge("interpolate", END)
-    return graph.compile()
+def build_extraction_graph() -> StateGraph:
+    """Constructs the extraction pipeline graph."""
+    workflow = StateGraph(AgentState)
+    workflow.add_node("parse_input", parse_input_node)
+    workflow.add_node("review_input", review_input_node)
+    workflow.set_entry_point("parse_input")
+    workflow.add_edge("parse_input", "review_input")
+    return workflow.compile()
 ```
 
 ### Docstrings
@@ -230,9 +246,10 @@ def newton_interpolation(points: list[tuple[float, float]], x: float) -> float:
 ├── backend/
 │   ├── api/           # FastAPI + LangServe routes
 │   ├── agent/         # LangGraph agent definition
-│   ├── tools/         # Tool implementations
+│   ├── src/           # Core interpolation math functions
 │   ├── models/        # Pydantic models
-│   └── utils/         # Utility functions
+│   ├── utils/         # Utility functions
+│   └── tests/         # Unit and integration tests
 ├── frontend/
 │   └── src/
 │       ├── components/
@@ -251,3 +268,6 @@ def newton_interpolation(points: list[tuple[float, float]], x: float) -> float:
 2. **Tool-first approach**: Prefer creating reusable tools over inline logic
 3. **Session-only memory**: No persistent storage of chat history
 4. **Domain focus**: Reject non-interpolation requests gracefully
+5. **Strict Validation**:
+    - Duplicate X coordinates MUST trigger immediate cancellation with a specific message.
+    - Newton methods (forward/backward) REQUIRE equidistant points; otherwise, trigger immediate cancellation.
