@@ -19,6 +19,7 @@ from backend.src.graph_polynomial import graph_polynomial
 from backend.src.lagrange_interpolation import lagrange_interpolation
 from backend.src.newton_backward_interpolation import newton_backward_interpolation
 from backend.src.newton_forward_interpolation import newton_forward_interpolation
+from backend.src.hermite_interpolation import hermite_interpolation
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -35,8 +36,8 @@ class AgentState(TypedDict):
         clean_requests: The list of validated interpolation requests.
         valid: Boolean flag indicating if the requests are valid and ready for execution.
         final_response_text: Text response for non-interpolation queries.
-        method: The interpolation method to use ("auto", "lagrange", "newton_forward",
-        "newton_backward", "direct").
+        method: The interpolation method to use ("lagrange", "newton_forward",
+        "newton_backward", "direct", "hermite").
     """
 
     messages: Annotated[Sequence[BaseMessage], operator.add]
@@ -129,10 +130,16 @@ def review_input_node(state: AgentState) -> dict:
     # 2. Validate Requests
     valid_requests = []
     errors = []
-    valid_methods = {"lagrange", "newton_forward", "newton_backward", "direct"}
+    valid_methods = {
+        "lagrange",
+        "newton_forward",
+        "newton_backward",
+        "direct",
+        "hermite",
+    }
 
     for idx, req in enumerate(output.requests):
-        req.method = state.get("method") or req.method or "auto"
+        req.method = state.get("method") or req.method or "lagrange"
         # Check points count
         if len(req.points) < 2:
             errors.append(f"Request {idx + 1}: Needs at least 2 points.")
@@ -203,7 +210,7 @@ def build_extraction_graph():
 
 
 def process_request(
-    user_input: str, image_base64: str | None = None, method: str = "auto"
+    user_input: str, image_base64: str | None = None, method: str = "lagrange"
 ) -> list[InterpolationResponseWithMetadata] | str:
     """
     Orchestrates the full interpolation pipeline.
@@ -266,8 +273,6 @@ def process_request(
 
     # Deterministic Execution Loop
     for req in requests:
-        if method == "auto":
-            method = req.method
         try:
             # Route to appropriate math function
             if method == "lagrange":
@@ -278,6 +283,8 @@ def process_request(
                 response_dict = newton_backward_interpolation(req.points, req.x_evals)
             elif method == "direct":
                 response_dict = direct_interpolation(req.points, req.x_evals)
+            elif method == "hermite":
+                response_dict = hermite_interpolation(req.points, req.x_evals)
             else:
                 response_dict = lagrange_interpolation(req.points, req.x_evals)
 

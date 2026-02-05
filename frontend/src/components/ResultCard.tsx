@@ -10,6 +10,7 @@ const METHOD_NAMES: Record<string, string> = {
   newton_forward: "Newtonova Interpolacija Unaprijed",
   newton_backward: "Newtonova Interpolacija Unazad",
   direct: "Direktna Interpolacija",
+  hermite: "Hermitova Interpolacija",
 };
 
 const ResultCard: React.FC<ResultCardProps> = ({ data }) => {

@@ -16,6 +16,7 @@ from .newton_interpolation_util import (
 )
 from .general_util import multiply_polynomials, evaluate_polynomial
 from .lagrange_interpolation_util import get_lagrange_coefficients
+from .hermite_interpolation_util import get_hermite_coefficients
 
 __all__ = [
     "bjorck_pereyra",
@@ -27,4 +28,5 @@ __all__ = [
     "multiply_polynomials",
     "get_lagrange_coefficients",
     "evaluate_polynomial",
+    "get_hermite_coefficients",
 ]

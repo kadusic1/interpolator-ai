@@ -22,22 +22,7 @@ Your goal is to parse user input, identify one or MORE interpolation requests, a
 - **Transformations:** If the user implies a modification (e.g., "add 2 to all y values"), **APPLY** that math mentally and output the *transformed* points.
 - **Evaluation Points:** Combine ALL requested evaluation x-coordinates for the dataset into the single `x_evals` list (e.g. "at x=1 and x=5" -> x_evals=[1.0, 5.0]). If none provided, use null.
 
-### 2. Method Selection Logic (Per Request)
-Select based on these rules:
-
-**A. Check Equidistance:**
-   - Are intervals between x-values equal? 
-   - **IF NO:** -> `lagrange_interpolation`
-
-**B. If Equidistant:**
-   - **If any `x_eval` is near START:** -> `newton_forward_interpolation`
-   - **If any `x_eval` is near END:** -> `newton_backward_interpolation`
-   - **If mixed or no x_evals:** -> `newton_forward_interpolation` (Default Newton)
-
-**C. Fallback:**
-   - Default to `lagrange_interpolation`.
-
-### 3. Output Format
+### 2. Output Format
 Return ONLY valid JSON. The root object must be an array of request objects.
 """
 

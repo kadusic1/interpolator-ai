@@ -22,7 +22,7 @@ app.add_middleware(
 class AgentQuery(BaseModel):
     user_input: str
     image_base64: str | None = None
-    method: str = "auto"
+    method: str = "lagrange"  # Default method
 
 
 @app.post(

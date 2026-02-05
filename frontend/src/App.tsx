@@ -98,8 +98,8 @@ function App() {
                 Kako vam mogu pomoći sa interpolacijom danas?
               </h1>
               <p className="text-gray-500 max-w-md">
-                Mogu interpolirati podatke koristeći Lagrangeovu, Newtonovu ili direktnu
-                metodu. Samo upišite tačke kao{" "}
+                Mogu interpolirati podatke koristeći Lagrangeovu, Newtonovu, Hermitovu
+                ili direktnu metodu. Samo upišite tačke kao{" "}
                 <code className="bg-white px-1.5 py-0.5 rounded border border-gray-200 text-sm font-mono">
                   (1,2), (3,4)
                 </code>

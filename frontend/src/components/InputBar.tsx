@@ -2,12 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   Send,
   ChevronDown,
-  Sparkles,
   Waves,
   ArrowUpRight,
   ArrowDownRight,
   Target,
   Image as ImageIcon,
+  Sparkles,
   X,
 } from "lucide-react";
 import clsx from "clsx";
@@ -25,16 +25,16 @@ interface ModeOption {
 }
 
 const MODES: ModeOption[] = [
-  { id: "auto", label: "Automatski", icon: Sparkles },
   { id: "lagrange", label: "Lagrange", icon: Waves },
   { id: "newton_forward", label: "Newton Nap.", icon: ArrowUpRight },
   { id: "newton_backward", label: "Newton Naz.", icon: ArrowDownRight },
   { id: "direct", label: "Direktna", icon: Target },
+  { id: "hermite", label: "Hermitova", icon: Sparkles }
 ];
 
 const InputBar: React.FC<InputBarProps> = ({ onSend, isLoading }) => {
   const [input, setInput] = useState("");
-  const [method, setMethod] = useState<AgentQuery["method"]>("auto");
+  const [method, setMethod] = useState<AgentQuery["method"]>("lagrange");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);

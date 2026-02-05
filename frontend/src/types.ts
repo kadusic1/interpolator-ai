@@ -1,7 +1,7 @@
 export interface AgentQuery {
   user_input: string;
   image_base64?: string | null;
-  method: "auto" | "lagrange" | "newton_forward" | "newton_backward" | "direct";
+  method: "lagrange" | "newton_forward" | "newton_backward" | "direct" | "hermite";
 }
 
 export interface InterpolationResponse {
