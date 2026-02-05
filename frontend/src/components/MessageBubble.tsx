@@ -28,7 +28,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         {isUser ? <User size={18} /> : <Bot size={18} />}
       </div>
 
-      {/* Content */}
+        {/* Content */}
       <div
         className={clsx(
           "flex flex-col max-w-[85%]",
@@ -38,6 +38,17 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         <div className="text-sm font-medium text-gray-500 mb-1">
           {isUser ? "You" : "Interpolator"}
         </div>
+
+        {/* User Image Attachment */}
+        {message.image && (
+          <div className="mb-2">
+            <img 
+              src={message.image} 
+              alt="User uploaded" 
+              className="max-h-64 rounded-xl border border-gray-200 shadow-sm object-cover"
+            />
+          </div>
+        )}
 
         {typeof message.content === "string" ? (
           <div

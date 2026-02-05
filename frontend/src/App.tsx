@@ -27,6 +27,7 @@ function App() {
       id: Date.now().toString(),
       type: "user",
       content: query.user_input,
+      image: query.image_base64,
       timestamp: Date.now(),
     };
 
@@ -34,12 +35,18 @@ function App() {
     setIsLoading(true);
 
     try {
+      // Prepare payload for API - strip data URI prefix from image
+      const apiQuery = { ...query };
+      if (apiQuery.image_base64 && apiQuery.image_base64.includes(",")) {
+        apiQuery.image_base64 = apiQuery.image_base64.split(",")[1];
+      }
+
       const response = await fetch("http://localhost:8000/process", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(query),
+        body: JSON.stringify(apiQuery),
       });
 
       if (!response.ok) {
