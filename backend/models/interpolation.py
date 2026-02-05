@@ -9,7 +9,9 @@ class InterpolationRequest(BaseModel):
     points: list[tuple[float, float]] = Field(
         ..., min_length=2, description="Data points as (x, y) tuples"
     )
-    x_eval: float = Field(..., description="X-coordinate to interpolate at")
+    x_evals: list[float] | None = Field(
+        None, description="Optional X-coordinates to interpolate at"
+    )
     method: str = Field(..., description="Interpolation method name")
 
 
@@ -31,7 +33,9 @@ class InterpolationRequestList(BaseModel):
 class InterpolationResponse(BaseModel):
     """Base response model for all interpolation methods."""
 
-    result: float = Field(..., description="Interpolated y-value at x_eval")
+    results: list[float] | None = Field(
+        None, description="Interpolated y-values at x_evals"
+    )
     polynomial_degree: int = Field(
         ..., description="Degree of the interpolating polynomial"
     )
@@ -52,7 +56,7 @@ class InterpolationResponse(BaseModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "result": 3.25,
+                    "results": [3.25],
                     "coefficients": [1.0, 0.5, 1.0],
                     "polynomial_degree": 2,
                 }

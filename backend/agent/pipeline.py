@@ -263,15 +263,15 @@ def process_request(
         try:
             # Route to appropriate math function
             if method == "lagrange":
-                response_dict = lagrange_interpolation(req.points, req.x_eval)
+                response_dict = lagrange_interpolation(req.points, req.x_evals)
             elif method == "newton_forward":
-                response_dict = newton_forward_interpolation(req.points, req.x_eval)
+                response_dict = newton_forward_interpolation(req.points, req.x_evals)
             elif method == "newton_backward":
-                response_dict = newton_backward_interpolation(req.points, req.x_eval)
+                response_dict = newton_backward_interpolation(req.points, req.x_evals)
             elif method == "direct":
-                response_dict = direct_interpolation(req.points, req.x_eval)
+                response_dict = direct_interpolation(req.points, req.x_evals)
             else:
-                response_dict = lagrange_interpolation(req.points, req.x_eval)
+                response_dict = lagrange_interpolation(req.points, req.x_evals)
 
             # Generate Graph
             coeffs = response_dict["coefficients"]

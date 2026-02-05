@@ -5,7 +5,9 @@ from backend.utils.lagrange_interpolation_util import get_lagrange_coefficients
 from backend.utils.general_util import evaluate_polynomial
 
 
-def lagrange_interpolation(points: list[tuple[float, float]], x_eval: float) -> dict:
+def lagrange_interpolation(
+    points: list[tuple[float, float]], x_evals: list[float] | None
+) -> dict:
     """
     Perform Lagrange polynomial interpolation.
 
@@ -24,11 +26,11 @@ def lagrange_interpolation(points: list[tuple[float, float]], x_eval: float) -> 
 
     Args:
         points: List of (x, y) coordinate tuples. Must have at least 2 points.
-        x_eval: The x-coordinate at which to evaluate the polynomial.
+        x_evals: List of x-coordinates at which to evaluate the polynomial.
 
     Returns:
         Dictionary containing:
-            - 'result': The interpolated y-value at x_eval
+            - 'results': The interpolated y-values at x_evals
             - 'coefficients': List of polynomial coefficients [a0, a1, a2, ...]
             - 'polynomial_degree': Degree of the interpolating polynomial
 
@@ -38,9 +40,9 @@ def lagrange_interpolation(points: list[tuple[float, float]], x_eval: float) -> 
 
     Example:
         >>> points = [(3.40, 0.294118), (3.50, 0.285714), (3.35, 0.298507)]
-        >>> lagrange_interpolation(points, 3.45)
+        >>> lagrange_interpolation(points, [3.45])
         {
-            'result': 0.289855,
+            'results': [0.289855],
             'coefficients': [a0, a1, a2],
             'polynomial_degree': 2
         }
@@ -57,15 +59,17 @@ def lagrange_interpolation(points: list[tuple[float, float]], x_eval: float) -> 
 
     # Get polynomial coefficients (calculates basis polynomials once)
     coefficients = get_lagrange_coefficients(points)
-    # Evaluate the polynomial at x_eval using the coefficients
-    result = evaluate_polynomial(coefficients, x_eval)
+    # Evaluate the polynomial at x_evals using the coefficients
+    results = None
+    if x_evals:
+        results = [evaluate_polynomial(coefficients, x) for x in x_evals]
 
     # Calculate polynomial degree (n-1 for n points)
     polynomial_degree = len(points) - 1
 
     # Return structured response as dictionary
     return InterpolationResponse(
-        result=result,
+        results=results,
         coefficients=coefficients,
         polynomial_degree=polynomial_degree,
     ).model_dump()
