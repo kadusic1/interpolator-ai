@@ -7,8 +7,8 @@ interface ResultCardProps {
 
 const METHOD_NAMES: Record<string, string> = {
   lagrange: "Lagrange Interpolacija",
-  newton_forward: "Newton Naprijed Interpolacija",
-  newton_backward: "Newton Nazad Interpolacija",
+  newton_forward: "Newtonova Interpolacija Unaprijed",
+  newton_backward: "Newtonova Interpolacija Unazad",
   direct: "Direktna Interpolacija",
 };
 
