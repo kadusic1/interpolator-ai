@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import operator
-from typing import Annotated, Any, Sequence, TypedDict
+from typing import Annotated, Sequence, TypedDict
 
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
@@ -94,7 +94,6 @@ def review_input_node(state: AgentState) -> dict:
     Checks for:
     1.  Minimum number of points (>= 2).
     2.  Unique x-coordinates.
-    3.  Validity of the interpolation method name.
 
     If errors are found, it constructs a feedback message using `REVIEW_ERROR_TEMPLATE`
     to prompt the LLM to retry.
@@ -130,16 +129,9 @@ def review_input_node(state: AgentState) -> dict:
     # 2. Validate Requests
     valid_requests = []
     errors = []
-    valid_methods = {
-        "lagrange",
-        "newton_forward",
-        "newton_backward",
-        "direct",
-        "hermite",
-    }
+    method = state.get("method")
 
     for idx, req in enumerate(output.requests):
-        req.method = state.get("method") or req.method or "lagrange"
         # Check points count
         if len(req.points) < 2:
             errors.append(f"Request {idx + 1}: Needs at least 2 points.")
@@ -154,12 +146,8 @@ def review_input_node(state: AgentState) -> dict:
                 "final_response_text": "Invalid input: Duplicate x-coordinates found. Process cancelled.",
             }
 
-        # Normalize Method
-        if req.method not in valid_methods:
-            req.method = "lagrange"  # Default fallback
-
         # Check equidistant for Newton methods - STRICT CANCELLATION
-        if req.method in ("newton_forward", "newton_backward"):
+        if method in ("newton_forward", "newton_backward"):
             x_sorted = sorted(x_vals)
             diffs = [x_sorted[i + 1] - x_sorted[i] for i in range(len(x_sorted) - 1)]
             # Check if any difference deviates from the first one significantly
@@ -167,7 +155,7 @@ def review_input_node(state: AgentState) -> dict:
                 return {
                     "valid": True,
                     "clean_requests": [],
-                    "final_response_text": f"Invalid input: Points must be equidistant for {req.method} interpolation. Process cancelled.",
+                    "final_response_text": f"Invalid input: Points must be equidistant for {method} interpolation. Process cancelled.",
                 }
 
         valid_requests.append(req)
@@ -257,8 +245,9 @@ def process_request(
 
     # Run Extraction Graph
     try:
-        final_state = graph.invoke(initial_state, config={"recursion_limit": 3})
+        final_state = graph.invoke(initial_state, config={"recursion_limit": 12})
     except Exception as e:
+        logger.error(f"Pipeline execution failed: {e}")
         return "Invalid interpolation request. Please ensure your input is clear and try again."
 
     # Handle Non-Interpolation / Clarification

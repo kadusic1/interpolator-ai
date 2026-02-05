@@ -13,7 +13,6 @@ class InterpolationRequest(BaseModel):
     x_evals: list[float] | None = Field(
         None, description="Optional X-coordinates to interpolate at"
     )
-    method: str = Field(..., description="Interpolation method name")
 
 
 class InterpolationRequestList(BaseModel):

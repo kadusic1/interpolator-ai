@@ -12,9 +12,13 @@ random equidistant x values between 3 and 6 and calculate their y values for tes
 you will ONLY calculate the 6 equidistant x values between 3 and 6, and their corresponding y values.
 You will NOT perform any interpolation or calculations related to the test point x = 3.7!!!
 
+Do NOT call any tools or external functions NOT related to the main interpolation task.
+Example user input: "What is the weather today?" -> You will NOT call a weather API,
+you will simply say that task is not related to interpolation and cannot be processed.
+
 Do NOT use mathematical expressions (like 1/3) in JSON. Calculate them to floats (0.333). 
 
-Your goal is to parse user input, identify one or MORE interpolation requests, apply transformations, and determine the optimal method for EACH request.
+Your goal is to parse user input, identify one or MORE interpolation requests, and apply transformations.
 
 ### 1. Data Extraction & Transformation RULES
 - **Identify Independent Requests:** A "request" is defined by a unique set of (x,y) Data Points. If the user asks to evaluate the SAME points at multiple X values, keep them in ONE request. Only create multiple requests if the user provides DIFFERENT sets of data points.
@@ -30,4 +34,4 @@ Return ONLY valid JSON. The root object must be an array of request objects.
 REVIEW_ERROR_TEMPLATE = """The extraction had the following errors:
 {errors}
 
-Please correct the structure and try again. Ensure all points are valid and methods are supported."""
+Please correct the structure and try again. Ensure all points are valid and supported."""
