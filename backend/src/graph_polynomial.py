@@ -65,7 +65,6 @@ def graph_polynomial(
 
     # Plot polynomial curve
     polynomial_string = get_polynomial_string(coefficients)
-    breakpoint()
     ax.plot(x_curve, y_curve, "b-", linewidth=2, label=polynomial_string)
 
     # Plot original data points
