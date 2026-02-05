@@ -6,7 +6,7 @@ import io
 import matplotlib.pyplot as plt
 import numpy as np
 
-from backend.utils.general_util import evaluate_polynomial
+from backend.utils.general_util import evaluate_polynomial, get_polynomial_string
 
 
 def graph_polynomial(
@@ -44,7 +44,7 @@ def graph_polynomial(
     # Calculate x-range with 10% margin on each side
     x_min = min(x_points)
     x_max = max(x_points)
-    margin = (x_max - x_min) * 0.1
+    margin = x_max - x_min
     x_range_start = x_min - margin
     x_range_end = x_max + margin
 
@@ -64,7 +64,9 @@ def graph_polynomial(
     fig, ax = plt.subplots(figsize=(8, 6))
 
     # Plot polynomial curve
-    ax.plot(x_curve, y_curve, "b-", linewidth=2, label="P(x)")
+    polynomial_string = get_polynomial_string(coefficients)
+    breakpoint()
+    ax.plot(x_curve, y_curve, "b-", linewidth=2, label=polynomial_string)
 
     # Plot original data points
     ax.scatter(x_points, y_points, color="red", s=50, zorder=5, label="Data points")
@@ -78,9 +80,9 @@ def graph_polynomial(
 
     # Add axes through origin (only if 0 is within range)
     if y_range_start <= 0 <= y_range_end:
-        ax.axhline(y=0, color="k", linewidth=0.5)
+        ax.axhline(y=0, color="k", linewidth=1.5)
     if x_range_start <= 0 <= x_range_end:
-        ax.axvline(x=0, color="k", linewidth=0.5)
+        ax.axvline(x=0, color="k", linewidth=1.5)
 
     # Labels and legend
     ax.set_xlabel("x")
