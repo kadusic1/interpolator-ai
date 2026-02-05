@@ -64,8 +64,8 @@ def graph_polynomial(
     fig, ax = plt.subplots(figsize=(8, 6))
 
     # Plot polynomial curve
-    polynomial_string = get_polynomial_string(coefficients)
-    ax.plot(x_curve, y_curve, "b-", linewidth=2, label=polynomial_string)
+    # polynomial_string = get_polynomial_string(coefficients)
+    ax.plot(x_curve, y_curve, "b-", linewidth=2, label="P(x)")
 
     # Plot original data points
     ax.scatter(x_points, y_points, color="red", s=50, zorder=5, label="Data points")

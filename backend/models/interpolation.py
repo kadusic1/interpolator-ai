@@ -75,3 +75,14 @@ class InterpolationResponseWithMetadata(InterpolationResponse):
     image_base64: str = Field(
         ..., description="Base64 encoded PNG image of the polynomial graph"
     )
+
+    @field_validator("points", "coefficients", mode="after")
+    @classmethod
+    def round_values(cls, v: Any) -> Any:
+        if isinstance(v, list) and len(v) > 0:
+            # Handle list of tuples (points)
+            if isinstance(v[0], tuple):
+                return [(round(p[0], 6), round(p[1], 6)) for p in v]
+            # Handle list of floats (coefficients)
+            return [round(x, 6) for x in v]
+        return v
