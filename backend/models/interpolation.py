@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any
 from pydantic import BaseModel, Field, field_validator, ValidationInfo
 
 
@@ -74,6 +75,9 @@ class InterpolationResponseWithMetadata(InterpolationResponse):
     method: str = Field(..., description="Interpolation method name")
     image_base64: str = Field(
         ..., description="Base64 encoded PNG image of the polynomial graph"
+    )
+    formatted_results: list[tuple[float, float]] | None = Field(
+        None, description="Interpolated values as (x, y) tuples"
     )
 
     @field_validator("points", "coefficients", mode="after")

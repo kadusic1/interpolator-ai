@@ -70,18 +70,18 @@ const ResultCard: React.FC<ResultCardProps> = ({ data }) => {
         </div>
 
         {/* Interpolated Results */}
-        {data.results && data.results.length > 0 && (
+        {data.formatted_results && data.formatted_results.length > 0 && (
           <div>
             <h4 className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">
               Interpolated Values
             </h4>
             <div className="flex flex-wrap gap-2">
-              {data.results.map((res, i) => (
+              {data.formatted_results.map((res, i) => (
                 <span
                   key={i}
                   className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-green-50 text-green-700 font-mono"
                 >
-                  y ≈ {res.toFixed(6)}
+                   P({res[0]}) ≈ {res[1].toFixed(6)}
                 </span>
               ))}
             </div>

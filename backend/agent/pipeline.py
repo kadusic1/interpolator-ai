@@ -285,12 +285,19 @@ def process_request(
             coeffs = response_dict["coefficients"]
             graph_result = graph_polynomial(coeffs, req.points)
 
+            # Map raw y-values to (x, y) tuples if evaluation points exist
+            raw_results = response_dict.get("results")
+            formatted_results = None
+            if raw_results and req.x_evals:
+                formatted_results = list(zip(req.x_evals, raw_results))
+
             # Aggregate Result
             final_obj = InterpolationResponseWithMetadata(
                 **response_dict,
                 points=req.points,
                 method=method,
                 image_base64=graph_result["image_base64"],
+                formatted_results=formatted_results,
             )
             results.append(final_obj)
 

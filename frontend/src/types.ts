@@ -14,6 +14,7 @@ export interface InterpolationResponseWithMetadata extends InterpolationResponse
   points: [number, number][];
   method: string;
   image_base64: string;
+  formatted_results: [number, number][] | null;
 }
 
 export type MessageType = "user" | "ai";
