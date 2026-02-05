@@ -20,7 +20,7 @@ const Header: React.FC<HeaderProps> = ({ onClear }) => {
       <button
         onClick={onClear}
         className="p-2 rounded-full hover:bg-gray-200 text-gray-600 transition-colors tooltip-target"
-        title="Clear conversation"
+        title="Očisti razgovor"
       >
         <Eraser size={20} />
       </button>

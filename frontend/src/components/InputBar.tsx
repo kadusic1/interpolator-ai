@@ -25,11 +25,11 @@ interface ModeOption {
 }
 
 const MODES: ModeOption[] = [
-  { id: "auto", label: "Auto", icon: Sparkles },
+  { id: "auto", label: "Automatski", icon: Sparkles },
   { id: "lagrange", label: "Lagrange", icon: Waves },
-  { id: "newton_forward", label: "Newton Fwd.", icon: ArrowUpRight },
-  { id: "newton_backward", label: "Newton Bwd.", icon: ArrowDownRight },
-  { id: "direct", label: "Direct", icon: Target },
+  { id: "newton_forward", label: "Newton Nap.", icon: ArrowUpRight },
+  { id: "newton_backward", label: "Newton Naz.", icon: ArrowDownRight },
+  { id: "direct", label: "Direktna", icon: Target },
 ];
 
 const InputBar: React.FC<InputBarProps> = ({ onSend, isLoading }) => {
@@ -64,12 +64,12 @@ const InputBar: React.FC<InputBarProps> = ({ onSend, isLoading }) => {
 
   const handleFile = (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      alert("File size should be less than 5MB");
+      alert("Veličina datoteke mora biti manja od 5MB");
       return;
     }
     
     if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file");
+      alert("Molimo učitajte sliku");
       return;
     }
 
@@ -175,7 +175,7 @@ const InputBar: React.FC<InputBarProps> = ({ onSend, isLoading }) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Enter points (e.g., (1,2), (3,4)) or ask a question..."
+          placeholder="Unesite tačke (npr. (1,2), (3,4)) ili funkciju..."
           className="w-full bg-transparent border-0 focus:ring-0 resize-none px-4 py-3 min-h-[52px] max-h-[200px] text-gray-800 placeholder-gray-500 outline-none"
           rows={1}
           disabled={isLoading}
@@ -197,7 +197,7 @@ const InputBar: React.FC<InputBarProps> = ({ onSend, isLoading }) => {
             <button
               onClick={() => fileInputRef.current?.click()}
               className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-primary transition-colors"
-              title="Add image"
+              title="Dodaj sliku"
             >
               <ImageIcon size={20} />
             </button>
@@ -263,12 +263,6 @@ const InputBar: React.FC<InputBarProps> = ({ onSend, isLoading }) => {
             <Send size={18} />
           </button>
         </div>
-      </div>
-
-      <div className="text-center mt-2">
-        <p className="text-[10px] text-gray-400">
-          AI can make mistakes. Please double check the interpolation results.
-        </p>
       </div>
     </div>
   );

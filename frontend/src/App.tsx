@@ -74,7 +74,7 @@ function App() {
         id: (Date.now() + 1).toString(),
         type: "ai",
         content:
-          "I'm sorry, I encountered an error communicating with the server. Please ensure the backend is running.",
+          "Žao mi je, došlo je do greške u komunikaciji sa serverom. Molim vas, provjerite da li backend radi.",
         timestamp: Date.now(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -95,11 +95,11 @@ function App() {
                 <Bot size={32} className="text-primary" />
               </div>
               <h1 className="text-2xl md:text-3xl font-medium text-gray-800 mb-2">
-                How can I help you calculate today?
+                Kako vam mogu pomoći sa interpolacijom danas?
               </h1>
               <p className="text-gray-500 max-w-md">
-                I can interpolate data points using Lagrange, Newton, or Direct
-                methods. Just type your points like{" "}
+                Mogu interpolirati podatke koristeći Lagrangeovu, Newtonovu ili direktnu
+                metodu. Samo upišite tačke kao{" "}
                 <code className="bg-white px-1.5 py-0.5 rounded border border-gray-200 text-sm font-mono">
                   (1,2), (3,4)
                 </code>

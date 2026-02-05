@@ -36,7 +36,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         )}
       >
         <div className="text-sm font-medium text-gray-500 mb-1">
-          {isUser ? "You" : "Interpolator"}
+          {isUser ? "Vi" : "Interpolator"}
         </div>
 
         {/* User Image Attachment */}
@@ -44,7 +44,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
           <div className="mb-2">
             <img 
               src={message.image} 
-              alt="User uploaded" 
+              alt="Korisnik je učitao" 
               className="max-h-64 rounded-xl border border-gray-200 shadow-sm object-cover"
             />
           </div>

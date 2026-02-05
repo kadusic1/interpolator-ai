@@ -5,15 +5,22 @@ interface ResultCardProps {
   data: InterpolationResponseWithMetadata;
 }
 
+const METHOD_NAMES: Record<string, string> = {
+  lagrange: "Lagrange Interpolacija",
+  newton_forward: "Newton Naprijed Interpolacija",
+  newton_backward: "Newton Nazad Interpolacija",
+  direct: "Direktna Interpolacija",
+};
+
 const ResultCard: React.FC<ResultCardProps> = ({ data }) => {
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm my-4 max-w-3xl w-full">
       <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
         <span className="font-semibold text-gray-700 capitalize">
-          {data.method.replace(/_/g, " ")}
+          {METHOD_NAMES[data.method] || data.method.replace(/_/g, " ")}
         </span>
         <span className="text-xs text-gray-500 font-mono">
-          Degree: {data.polynomial_degree}
+          Stepen: {data.polynomial_degree}
         </span>
       </div>
 
@@ -21,7 +28,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ data }) => {
         {/* Points Table */}
         <div>
           <h4 className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">
-            Input Points
+            Ulazne tačke
           </h4>
           <div className="flex flex-wrap gap-2">
             {data.points.map((p, i) => (
@@ -38,7 +45,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ data }) => {
         {/* Polynomial Form */}
         <div>
           <h4 className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">
-            Polynomial Equation
+            Polinomska jednačina
           </h4>
           <div className="bg-blue-50 p-3 rounded-lg font-mono text-sm text-blue-700 break-words">
             P(x) = {data.coefficients.map((c, i) => {
@@ -73,7 +80,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ data }) => {
         {data.formatted_results && data.formatted_results.length > 0 && (
           <div>
             <h4 className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">
-              Interpolated Values
+              Interpolirane vrijednosti
             </h4>
             <div className="flex flex-wrap gap-2">
               {data.formatted_results.map((res, i) => (
@@ -91,12 +98,12 @@ const ResultCard: React.FC<ResultCardProps> = ({ data }) => {
         {/* Graph */}
         <div>
           <h4 className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">
-            Visualization
+            Vizualizacija
           </h4>
           <div className="border border-gray-100 rounded-lg overflow-hidden bg-white flex justify-center">
             <img
               src={`data:image/png;base64,${data.image_base64}`}
-              alt="Interpolation Graph"
+              alt="Graf interpolacije"
               className="max-w-full h-auto"
             />
           </div>
