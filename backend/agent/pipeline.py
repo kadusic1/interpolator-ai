@@ -184,7 +184,7 @@ def build_extraction_graph():
 
 
 def process_request(
-    user_input: str, image_base64: str | None = None
+    user_input: str, image_base64: str | None = None, method: str = "auto"
 ) -> list[InterpolationResponseWithMetadata] | str:
     """
     Orchestrates the full interpolation pipeline.
@@ -243,15 +243,17 @@ def process_request(
 
     # Deterministic Execution Loop
     for req in requests:
+        if method == "auto":
+            method = req.method
         try:
             # Route to appropriate math function
-            if req.method == "lagrange":
+            if method == "lagrange":
                 response_dict = lagrange_interpolation(req.points, req.x_eval)
-            elif req.method == "newton_forward":
+            elif method == "newton_forward":
                 response_dict = newton_forward_interpolation(req.points, req.x_eval)
-            elif req.method == "newton_backward":
+            elif method == "newton_backward":
                 response_dict = newton_backward_interpolation(req.points, req.x_eval)
-            elif req.method == "direct":
+            elif method == "direct":
                 response_dict = direct_interpolation(req.points, req.x_eval)
             else:
                 response_dict = lagrange_interpolation(req.points, req.x_eval)
@@ -264,7 +266,7 @@ def process_request(
             final_obj = InterpolationResponseWithMetadata(
                 **response_dict,
                 points=req.points,
-                method=req.method,
+                method=method,
                 image_base64=f"data:image/png;base64,{graph_result['image_base64']}",
             )
             results.append(final_obj)
