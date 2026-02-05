@@ -92,7 +92,7 @@ cd frontend && npm run dev
 ```python
 from __future__ import annotations
 
-def interpolate(points: list[tuple[float, float]], x: float) -> float:
+def interpolate(points: list[tuple[float, float]], x_evals: list[float] | None) -> dict:
     ...
 ```
 
@@ -146,15 +146,15 @@ class InterpolationTool:
         self.method = method
         self.precision = precision
 
-    def interpolate(self, points: list[tuple[float, float]], x: float) -> float:
-        """Interpolate to find y value at given x.
+    def interpolate(self, points: list[tuple[float, float]], x_evals: list[float] | None) -> dict:
+        """Interpolate to find y values at given x evaluations.
 
         Args:
             points: List of (x, y) coordinate tuples.
-            x: The x value to interpolate at.
+            x_evals: List of x values to interpolate at.
 
         Returns:
-            The interpolated y value.
+            Dictionary with results and coefficients.
 
         Raises:
             ValueError: If fewer than 2 points provided.
@@ -219,23 +219,23 @@ def build_extraction_graph() -> StateGraph:
 Use Google-style docstrings for all public functions and classes:
 
 ```python
-def newton_interpolation(points: list[tuple[float, float]], x: float) -> float:
+def newton_interpolation(points: list[tuple[float, float]], x_evals: list[float] | None) -> dict:
     """Perform Newton's divided difference interpolation.
 
     Args:
         points: Data points as (x, y) tuples. Must have at least 2 points.
-        x: The x-coordinate to evaluate the interpolating polynomial at.
+        x_evals: List of x-coordinates to evaluate the interpolating polynomial at.
 
     Returns:
-        The interpolated y-value at the given x coordinate.
+        Dictionary containing interpolated y-values ('results') and coefficients.
 
     Raises:
         ValueError: If points list has fewer than 2 elements.
 
     Example:
         >>> points = [(0, 1), (1, 2), (2, 5)]
-        >>> newton_interpolation(points, 1.5)
-        3.25
+        >>> newton_interpolation(points, [1.5])
+        {'results': [3.25], 'coefficients': [...]}
     """
 ```
 
@@ -271,3 +271,6 @@ def newton_interpolation(points: list[tuple[float, float]], x: float) -> float:
 5. **Strict Validation**:
     - Duplicate X coordinates MUST trigger immediate cancellation with a specific message.
     - Newton methods (forward/backward) REQUIRE equidistant points; otherwise, trigger immediate cancellation.
+6. **Request Grouping**:
+    - Multiple evaluation points for the SAME dataset must be grouped into a single `InterpolationRequest` with a list of `x_evals`.
+    - Do NOT split the same dataset into multiple requests just because there are multiple X values to check.
