@@ -12,17 +12,6 @@ class InterpolationRequest(BaseModel):
     x_eval: float = Field(..., description="X-coordinate to interpolate at")
     method: str = Field(..., description="Interpolation method name")
 
-    @field_validator("points")
-    @classmethod
-    def validate_unique_x(
-        cls, points: list[tuple[float, float]]
-    ) -> list[tuple[float, float]]:
-        """Validate that all x-coordinates are unique."""
-        x_values = [p[0] for p in points]
-        if len(x_values) != len(set(x_values)):
-            raise ValueError("X-coordinates must be unique")
-        return points
-
 
 class InterpolationRequestList(BaseModel):
     """Container for multiple interpolation requests."""

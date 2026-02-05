@@ -134,15 +134,30 @@ def review_input_node(state: AgentState) -> dict:
             errors.append(f"Request {idx + 1}: Needs at least 2 points.")
             continue
 
-        # Check unique x
+        # Check unique x - STRICT CANCELLATION
         x_vals = [p[0] for p in req.points]
         if len(set(x_vals)) != len(x_vals):
-            errors.append(f"Request {idx + 1}: X coordinates must be unique.")
-            continue
+            return {
+                "valid": True,
+                "clean_requests": [],
+                "final_response_text": "Invalid input: Duplicate x-coordinates found. Process cancelled.",
+            }
 
         # Normalize Method
         if req.method not in valid_methods:
             req.method = "lagrange"  # Default fallback
+
+        # Check equidistant for Newton methods - STRICT CANCELLATION
+        if req.method in ("newton_forward", "newton_backward"):
+            x_sorted = sorted(x_vals)
+            diffs = [x_sorted[i + 1] - x_sorted[i] for i in range(len(x_sorted) - 1)]
+            # Check if any difference deviates from the first one significantly
+            if diffs and not all(abs(d - diffs[0]) < 1e-9 for d in diffs):
+                return {
+                    "valid": True,
+                    "clean_requests": [],
+                    "final_response_text": f"Invalid input: Points must be equidistant for {req.method} interpolation. Process cancelled.",
+                }
 
         valid_requests.append(req)
 
