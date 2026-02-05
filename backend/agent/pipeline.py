@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import operator
+import sys
 from typing import Annotated, Sequence, TypedDict
 
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
@@ -22,6 +23,11 @@ from backend.src.newton_forward_interpolation import newton_forward_interpolatio
 from backend.src.hermite_interpolation import hermite_interpolation
 
 # Configure logger
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler(sys.stdout)],
+)
 logger = logging.getLogger(__name__)
 
 
@@ -246,6 +252,12 @@ def process_request(
     # Run Extraction Graph
     try:
         final_state = graph.invoke(initial_state, config={"recursion_limit": 12})
+        # Calculate steps based on history: (User Msg + Error Msgs) * 2 nodes per pass
+        steps = len(final_state["messages"]) * 2
+        # Log both the logic loops and the engine steps
+        logger.info(
+            f"Graph finished. Loops: {(len(final_state['messages']) + 1) // 2} | Recursion Steps: {steps}"
+        )
     except Exception as e:
         logger.error(f"Pipeline execution failed: {e}")
         return "Invalid interpolation request. Please ensure your input is clear and try again."
