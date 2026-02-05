@@ -40,7 +40,7 @@ def evaluate_polynomial(coeffs: list[float], x: float) -> float:
     return result
 
 
-def get_polynomial_string(coefficients: list[float], precision: int = 2) -> str:
+def get_polynomial_string(coefficients: list[float], precision: int = 6) -> str:
     """Constructs a LaTeX-formatted string representing a polynomial.
 
     Iterates through coefficients to build a string suitable for Matplotlib

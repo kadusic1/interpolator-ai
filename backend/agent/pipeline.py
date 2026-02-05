@@ -35,6 +35,8 @@ class AgentState(TypedDict):
         clean_requests: The list of validated interpolation requests.
         valid: Boolean flag indicating if the requests are valid and ready for execution.
         final_response_text: Text response for non-interpolation queries.
+        method: The interpolation method to use ("auto", "lagrange", "newton_forward",
+        "newton_backward", "direct").
     """
 
     messages: Annotated[Sequence[BaseMessage], operator.add]
@@ -42,6 +44,7 @@ class AgentState(TypedDict):
     clean_requests: list[InterpolationRequest]
     valid: bool
     final_response_text: str | None
+    method: str | None
 
 
 # --- Nodes ---
@@ -129,6 +132,7 @@ def review_input_node(state: AgentState) -> dict:
     valid_methods = {"lagrange", "newton_forward", "newton_backward", "direct"}
 
     for idx, req in enumerate(output.requests):
+        req.method = state.get("method") or req.method or "auto"
         # Check points count
         if len(req.points) < 2:
             errors.append(f"Request {idx + 1}: Needs at least 2 points.")
@@ -241,10 +245,14 @@ def process_request(
         "clean_requests": [],
         "valid": False,
         "final_response_text": None,
+        "method": method,
     }
 
     # Run Extraction Graph
-    final_state = graph.invoke(initial_state, config={"recursion_limit": 20})
+    try:
+        final_state = graph.invoke(initial_state, config={"recursion_limit": 3})
+    except Exception as e:
+        return "Invalid interpolation request. Please ensure your input is clear and try again."
 
     # Handle Non-Interpolation / Clarification
     if final_state.get("final_response_text"):
@@ -282,7 +290,7 @@ def process_request(
                 **response_dict,
                 points=req.points,
                 method=method,
-                image_base64=f"data:image/png;base64,{graph_result['image_base64']}",
+                image_base64=graph_result["image_base64"],
             )
             results.append(final_obj)
 
