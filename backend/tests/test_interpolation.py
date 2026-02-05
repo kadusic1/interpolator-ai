@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from backend.tools import (
+from backend.src import (
     direct_interpolation,
     lagrange_interpolation,
     newton_backward_interpolation,

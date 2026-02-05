@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-from langchain.tools import tool
-
 from backend.models.interpolation import InterpolationResponse
 from backend.utils.equation_solver import bjorck_pereyra
 
 
-@tool
 def direct_interpolation(points: list[tuple[float, float]], x_eval: float) -> dict:
     """
     Perform direct polynomial interpolation using Vandermonde system.

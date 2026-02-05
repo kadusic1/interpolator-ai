@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from langchain.tools import tool
-
 from backend.models.interpolation import InterpolationResponse
 from backend.utils.newton_interpolation_util import (
     backward_binomial_coefficient,
@@ -12,7 +10,6 @@ from backend.utils.newton_interpolation_util import (
 )
 
 
-@tool
 def newton_backward_interpolation(
     points: list[tuple[float, float]], x_eval: float
 ) -> dict:

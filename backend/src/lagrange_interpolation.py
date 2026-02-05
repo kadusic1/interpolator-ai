@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-from langchain.tools import tool
-
 from backend.models.interpolation import InterpolationResponse
 from backend.utils.lagrange_interpolation_util import get_lagrange_coefficients
 from backend.utils.general_util import evaluate_polynomial
 
 
-@tool
 def lagrange_interpolation(points: list[tuple[float, float]], x_eval: float) -> dict:
     """
     Perform Lagrange polynomial interpolation.
