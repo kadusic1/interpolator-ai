@@ -8,9 +8,7 @@ Relations:
 
 from .equation_solver import bjorck_pereyra
 from .newton_interpolation_util import (
-    backward_binomial_coefficient,
     compute_difference_table,
-    forward_binomial_coefficient,
     select_optimal_x0_index,
     validate_equidistant,
 )
@@ -22,8 +20,6 @@ __all__ = [
     "bjorck_pereyra",
     "validate_equidistant",
     "compute_difference_table",
-    "forward_binomial_coefficient",
-    "backward_binomial_coefficient",
     "select_optimal_x0_index",
     "multiply_polynomials",
     "get_lagrange_coefficients",
