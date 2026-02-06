@@ -5,8 +5,8 @@ Full-stack aplikacija za numeričku interpolaciju bazirana na LangGraph, FastAPI
 ## Quick Start
 
 ### Preduslovi
-*   Git
-*   Docker Desktop
+*   Instaliran Git
+*   Instaliran Docker
 
 ### Instalacija i Pokretanje
 
@@ -39,7 +39,7 @@ Full-stack aplikacija za numeričku interpolaciju bazirana na LangGraph, FastAPI
 
 ## Arhitektura
 
-Sustav koristi klijent-server arhitekturu gdje LangGraph agent orkestrira matematičke operacije.
+Sistem koristi klijent-server arhitekturu gdje LangGraph agent orkestrira matematičke operacije.
 
 ```mermaid
 graph LR
@@ -60,11 +60,11 @@ Proces validacije i izvršavanja interpolacijskih zahtjeva.
 
 ```mermaid
 flowchart TD
-    Start[Korisnički unos] --> Parse[LLM Parsiranje]
-    Parse --> Review{Validacija}
-    Review -->|Nevaljano| Error[Greška] --> Parse
+    Start[Korisnički unos] --> Parse[Parse Agent]
+    Parse --> Review{Revizioni Agent}
+    Review -->|Nije validno| Error[Greška] --> Parse
     Review -->|Nije interpolacija| Chat[Odgovor] --> End
-    Review -->|Validno| Calc[Izvršavanje] --> Graph[Generiranje grafa] --> End[Konačan odgovor]
+    Review -->|Validno| Calc[Interpolacija] --> Graph[Generiranje grafa] --> End[Konačan odgovor]
 ```
 
 ## Tehnološki Stack
