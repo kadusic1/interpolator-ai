@@ -26,10 +26,6 @@ venv/
 ENV/
 env/
 
-# uv
-.uv/
-uv.lock
-
 # IDEs
 .vscode/
 .idea/
@@ -77,3 +73,7 @@ Thumbs.db
 *.tmp
 *.temp
 .cache/
+
+# Other stuff
+*.txt
+*.png
