@@ -28,6 +28,9 @@ const ResultCard: React.FC<ResultCardProps> = ({ data }) => {
       <div className="p-6 space-y-6">
         {/* Points Table */}
         <div>
+          <p className="text-xs text-gray-400 mb-2">
+            Rezultati su zaokruženi na 6 decimala, a vrlo mali koeficijenti se izostavljaju radi preglednosti.
+          </p>
           <h4 className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">
             Ulazne tačke
           </h4>
@@ -54,7 +57,7 @@ const ResultCard: React.FC<ResultCardProps> = ({ data }) => {
               if (Math.abs(c) < 0.00001) return null;
 
               const isNegative = c < 0;
-              const absValue = Math.abs(c).toFixed(4);
+              const absValue = Math.abs(c);
               
               // 2. Determine the operator
               let sign = "";
