@@ -129,7 +129,7 @@ def review_input_node(state: AgentState) -> dict:
             "valid": True,
             "clean_requests": [],
             "final_response_text": output.clarification_message
-            or "I am an interpolation agent. Please provide data points.",
+            or "Ja sam interpolacijski agent. Unesite problem relevantan za interpolaciju.",
         }
 
     # 2. Validate Requests
@@ -143,13 +143,21 @@ def review_input_node(state: AgentState) -> dict:
             errors.append(f"Request {idx + 1}: Needs at least 2 points.")
             continue
 
+        # Check if there are at least 2 unique x-coordinates
+        if len(set(p[0] for p in req.points)) < 2:
+            return {
+                "valid": True,
+                "clean_requests": [],
+                "final_response_text": f"Morate imati najmanje 2 jedinstvene x-koordinate za interpolaciju.",
+            }
+
         # Check unique x - STRICT CANCELLATION
         x_vals = [p[0] for p in req.points]
         if len(set(x_vals)) != len(x_vals):
             return {
                 "valid": True,
                 "clean_requests": [],
-                "final_response_text": "Invalid input: Duplicate x-coordinates found. Process cancelled.",
+                "final_response_text": "Duplikati x-koordinata nisu dozvoljeni.",
             }
 
         # Check equidistant for Newton methods - STRICT CANCELLATION
@@ -161,7 +169,7 @@ def review_input_node(state: AgentState) -> dict:
                 return {
                     "valid": True,
                     "clean_requests": [],
-                    "final_response_text": f"Invalid input: Points must be equidistant for {method} interpolation. Process cancelled.",
+                    "final_response_text": f"Za Newtonove metode, x-koordinate moraju biti jednako udaljene (ekvidistantne).",
                 }
 
         valid_requests.append(req)
