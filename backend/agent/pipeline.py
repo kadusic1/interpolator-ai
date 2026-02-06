@@ -137,14 +137,9 @@ def review_input_node(state: AgentState) -> dict:
     errors = []
     method = state.get("method")
 
-    for idx, req in enumerate(output.requests):
+    for _, req in enumerate(output.requests):
         # Check points count
         if len(req.points) < 2:
-            errors.append(f"Request {idx + 1}: Needs at least 2 points.")
-            continue
-
-        # Check if there are at least 2 unique x-coordinates
-        if len(set(p[0] for p in req.points)) < 2:
             return {
                 "valid": True,
                 "clean_requests": [],

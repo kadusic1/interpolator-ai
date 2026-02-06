@@ -8,7 +8,7 @@ class InterpolationRequest(BaseModel):
     """Generic request model for all interpolation methods."""
 
     points: list[tuple[float, float]] = Field(
-        ..., min_length=2, description="Data points as (x, y) tuples"
+        ..., description="Data points as (x, y) tuples"
     )
     x_evals: list[float] | None = Field(
         None, description="Optional X-coordinates to interpolate at"
